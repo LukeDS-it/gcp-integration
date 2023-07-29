@@ -27,3 +27,9 @@ lazy val root = (project in file("."))
     )
   )
   .settings(DockerSettings.settings)
+
+lazy val integration = (project in file("integration"))
+  .dependsOn(root)
+  .settings(
+    publish / skip := true
+  )
