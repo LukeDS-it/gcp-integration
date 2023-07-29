@@ -54,7 +54,7 @@ jobs:
       - name: Setup git email
         run: git config user.email ${{secrets.EMAIL}}
       - name: Release
-        run: sbt "release skip-tests with-defaults"
+        run: sbt release
         env:
           DOCKER_USERNAME: ldsoftware
 
