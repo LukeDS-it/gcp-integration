@@ -14,7 +14,7 @@ object GcpTest extends App with LazyLogging {
     import system.executionContext
 
     Http()
-      .newServerAt("localhost", 8080)
+      .newServerAt("0.0.0.0", 8080)
       .bind(routes)
       .onComplete {
         case Success(binding)   => logger.info(s"Server started at ${binding.localAddress.getAddress}:${binding.localAddress.getPort}")
