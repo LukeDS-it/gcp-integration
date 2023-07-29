@@ -9,6 +9,8 @@ val circeVersion = "0.14.5"
 val scalaLoggingVersion = "3.9.5"
 
 lazy val root = (project in file("."))
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
   .settings(
     name := "gcp-integration",
     idePackagePrefix := Some("gcptest"),
@@ -24,3 +26,4 @@ lazy val root = (project in file("."))
       "ch.qos.logback" % "logback-classic" % "1.4.7",
     )
   )
+  .settings(DockerSettings.settings)
