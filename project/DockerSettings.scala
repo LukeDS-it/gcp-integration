@@ -5,6 +5,7 @@ import sbt.*
 object DockerSettings extends LinuxKeys {
 
   lazy val settings: Seq[Def.Setting[?]] = Seq(
+    dockerUsername := sys.env.get("DOCKER_USERNAME"),
     dockerExposedPorts := Seq(8080),
     dockerBaseImage := "openjdk:11"
   )
