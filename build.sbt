@@ -33,3 +33,5 @@ lazy val integration = (project in file("integration"))
   .settings(
     publish / skip := true
   )
+
+addCommandAlias("release", "Docker / publish")
