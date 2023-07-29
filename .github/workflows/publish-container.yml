@@ -41,7 +41,43 @@ jobs:
       - name: Unit tests
         run: sbt test
 
-  package:
+  major:
+    if: "!contains(github.event.head_commit.message, 'ci-skip') && contains(github.event.head_commit.message, '#major')"
+    name: Build and push Docker image
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login on docker registry
+        run: echo "${{secrets.DOCKER_PASSWORD}}" | docker login -u ldsoftware --password-stdin
+      - name: Setup git username
+        run: git config user.name LukeDS-it
+      - name: Setup git email
+        run: git config user.email ${{secrets.EMAIL}}
+      - name: Release
+        run: sbt "release skip-tests with-defaults"
+        env:
+          DOCKER_USERNAME: ldsoftware
+
+  minor:
+    if: "!contains(github.event.head_commit.message, 'ci-skip') && contains(github.event.head_commit.message, '#minor')"
+    name: Build and push Docker image
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login on docker registry
+        run: echo "${{secrets.DOCKER_PASSWORD}}" | docker login -u ldsoftware --password-stdin
+      - name: Setup git username
+        run: git config user.name LukeDS-it
+      - name: Setup git email
+        run: git config user.email ${{secrets.EMAIL}}
+      - name: Release
+        run: sbt "release skip-tests with-defaults"
+        env:
+          DOCKER_USERNAME: ldsoftware
+
+  patch:
     if: "!contains(github.event.head_commit.message, 'ci-skip')"
     name: Build and push Docker image
     needs: build
@@ -60,9 +96,13 @@ jobs:
           DOCKER_USERNAME: ldsoftware
 
   deploy:
-    if: "!contains(github.event.head_commit.message, 'ci-skip')"
     name: Deploy on production environment
-    needs: package
+    needs: [major, minor, patch]
+    if: |
+      always()
+      && !contains(github.event.head_commit.message, 'ci-skip')
+      && contains(needs.*.result, 'success')
+      && !contains(needs.*.result, 'failure')
     runs-on: ubuntu-latest
     environment: manual-actions
     steps:
