@@ -5,6 +5,13 @@ on:
     branches:
       - master
 
+env:
+  PROJECT_ID: YOUR_PROJECT_ID # TODO: update Google Cloud project id
+  GAR_LOCATION: YOUR_GAR_LOCATION # TODO: update Artifact Registry location
+  SERVICE: YOUR_SERVICE_NAME # TODO: update Cloud Run service name
+  REGION: YOUR_SERVICE_REGION # TODO: update Cloud Run service region
+  DOCKER_USER: ldsoftware
+
 jobs:
   build:
     if: "!contains(github.event.head_commit.message, 'ci-skip')"
@@ -49,7 +56,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Login on docker registry
-        run: echo "${{secrets.DOCKER_PASSWORD}}" | docker login -u ldsoftware --password-stdin
+        run: echo "${{secrets.DOCKER_PASSWORD}}" | docker login -u ${{ env.DOCKER_USER }} --password-stdin
       - name: Setup git username
         run: git config user.name LukeDS-it
       - name: Setup git email
@@ -57,13 +64,23 @@ jobs:
       - name: Release
         run: sbt release
         env:
-          DOCKER_USERNAME: ldsoftware
+          DOCKER_USERNAME: ${{ env.DOCKER_USER }}
 
   deploy:
     name: Deploy on production environment
     needs: package
     runs-on: ubuntu-latest
     environment: manual-actions
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
-      - name: Succeed
-        run: echo "Everything up to date"
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          image: ${{ env.DOCKER_USER }}/gcp-integration:1.0.0-SNAPSHOT
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
