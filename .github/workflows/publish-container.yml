@@ -78,7 +78,10 @@ jobs:
           DOCKER_USERNAME: ldsoftware
 
   patch:
-    if: "!contains(github.event.head_commit.message, 'ci-skip')"
+    if: | 
+      !contains(github.event.head_commit.message, 'ci-skip')
+      && !contains(github.event.head_commit.message, '#major')
+      && !contains(github.event.head_commit.message, '#minor')
     name: Build patch and publish Docker container
     needs: build
     runs-on: ubuntu-latest
