@@ -5,7 +5,8 @@ import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.*
 import sbt.{Def, *}
 import sbt.Keys.*
 import sbt.librarymanagement.*
-import sbtrelease.ReleasePlugin.autoImport.releaseCommitMessage
+import sbtrelease.ReleasePlugin.autoImport.{releaseCommitMessage, releaseVersionBump}
+import sbtrelease.Version.Bump
 
 object ReleaseSettings extends LibraryManagementSyntax {
 
@@ -23,6 +24,14 @@ object ReleaseSettings extends LibraryManagementSyntax {
     pomIncludeRepository := { _ => false },
     publishArtifact := false,
     publishTo := Some("releases" at "https://example.com/"), // Needs to be set by sbt-release plugin
-    releaseCommitMessage := s"Setting version to ${(ThisBuild / version).value} [ci-skip]"
+    releaseCommitMessage := s"Setting version to ${(ThisBuild / version).value} [ci-skip]",
+    releaseVersionBump := getVersionBumpStrategy
   )
+
+  private def getVersionBumpStrategy: Bump = sys.env.getOrElse("VERSION_BUMP", "patch") match {
+    case "major" => Bump.Major
+    case "minor" => Bump.Minor
+    case "patch" => Bump.Bugfix
+    case _       => Bump.Next
+  }
 }
