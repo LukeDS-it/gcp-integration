@@ -124,7 +124,7 @@ jobs:
       - name: Strip version
         id: version
         run: |
-          id=$(echo ${{steps.latest.outputs.}} | cut -dv -f2)
+          id=$(echo ${{ steps.latest.outputs.tag }} | cut -dv -f2)
           echo "id=$id" >> $GITHUB_OUTPUT
       - name: Deploy Docker image
         run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image ldsoftware/gcp-integration:${{ steps.version.outputs.id }}
