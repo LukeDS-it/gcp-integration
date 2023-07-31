@@ -101,34 +101,6 @@ jobs:
           DOCKER_USERNAME: ldsoftware
           VERSION_BUMP: patch
 
-  deploy:
-    name: Deploy on production environment
-    needs: [major, minor, patch]
-    if: |
-      always()
-      && !contains(github.event.head_commit.message, 'ci-skip')
-      && contains(needs.*.result, 'success')
-      && !contains(needs.*.result, 'failure')
-    runs-on: ubuntu-latest
-    environment: manual-actions
-    steps:
-      - name: Login
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_email: ${{ secrets.GCP_EMAIL }}
-          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
-      - name: Get previous tag
-        id: latest
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-      - name: Strip version
-        id: version
-        run: |
-          id=$(echo ${{ steps.latest.outputs.tag }} | cut -dv -f2)
-          echo "id=$id" >> $GITHUB_OUTPUT
-      - name: Deploy Docker image
-        run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image ldsoftware/gcp-integration:${{ steps.version.outputs.id }}
-
   skip:
     if: "contains(github.event.head_commit.message, 'ci-skip')"
     name: Skip CI requested
