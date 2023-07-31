@@ -9,6 +9,7 @@ val scalaLoggingVersion = "3.9.5"
 lazy val root = (project in file("."))
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(DockerPlugin)
+  .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "gcp-integration",
     idePackagePrefix := Some("gcptest"),
