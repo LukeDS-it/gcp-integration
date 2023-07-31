@@ -30,8 +30,8 @@ object ReleaseSettings extends LibraryManagementSyntax {
   )
 
   private def getReleaseVersion(current: String): String = getReleaseType match {
-    case Bump.Major => Version(current).map(_.bump(Bump.Major).string).getOrElse(versionFormatError(current))
-    case Bump.Minor => Version(current).map(_.bump(Bump.Minor).string).getOrElse(versionFormatError(current))
+    case Bump.Major => Version(current).map(_.bump(Bump.Major).withoutQualifier.string).getOrElse(versionFormatError(current))
+    case Bump.Minor => Version(current).map(_.bump(Bump.Minor).withoutQualifier.string).getOrElse(versionFormatError(current))
     case _          => Version(current).map(_.withoutQualifier.string).getOrElse(versionFormatError(current))
   }
 
