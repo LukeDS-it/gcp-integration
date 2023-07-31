@@ -27,6 +27,7 @@ lazy val root = (project in file("."))
   )
   .settings(DockerSettings.settings)
   .settings(ReleaseSettings.settings)
+  .settings(CompilerSettings.settings)
 
 lazy val integration = (project in file("integration"))
   .dependsOn(root)
